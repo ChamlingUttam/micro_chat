@@ -16,6 +16,19 @@ export const connectRabbitMQ = async()=>{
 
         console.log("connected to rabbitmq")
     } catch (error) {
-        console.log("rabbitMq is not connectes",error)
+        console.log("rabbitMq is not connects",error)
     }
+}
+
+export const publishTOQueue = async(queueName:string,message:any)=>{
+    if(!channel){
+        console.log("RabbitMq channel is not initalized ")
+        return
+    }
+
+    await channel.assertQueue(queueName,{durable:true})
+
+    channel.sendToQueue(queueName,Buffer.from(JSON.stringify(message)),{
+        persistent:true
+    })
 }
