@@ -2,6 +2,8 @@
 import { redisCLient } from "../index";
 import { TryCatch } from "../config/tryCatch";
 import { publishTOQueue } from "../config/rabbitmq";
+import { User } from "../model/User";
+import { generateToken } from "../config/generateToken";
 
 export const loginUser = TryCatch(async(req,res)=>{
     const {email} = req.body
@@ -36,4 +38,41 @@ export const loginUser = TryCatch(async(req,res)=>{
     res.status(200).json({message:"OTP send to your mail"})
 
 
+})
+
+
+export const verifyUser = TryCatch(async(req,res)=>{
+    const {email,otp:enteredOtp} = req.body
+
+    if(!email || !enteredOtp){
+        res.status(400).json({message:"email or OTP requires"})
+        return 
+    }
+
+    const otpKey = `otp:${email}`
+
+    const storedOtp = await redisCLient.get(otpKey)
+
+    if(!storedOtp || storedOtp !==enteredOtp){
+        res.status(400).json({
+            message:"invalid or expired otp"
+        })
+        return
+    }
+
+    await redisCLient.del(otpKey)
+
+    let user = await User.findOne({email})
+
+    if(!user){
+        const name = email.slice(0,8)
+        user = await User.create({name,email})
+    }
+
+    const token = generateToken(user)
+
+    res.json({
+        message:"user verified",
+        user,
+        token})
 })
