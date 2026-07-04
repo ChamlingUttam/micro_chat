@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const express_1 = __importDefault(require("express"));
+const consumer_1 = require("./consumer");
+(0, consumer_1.startSendOtpConsumer)();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

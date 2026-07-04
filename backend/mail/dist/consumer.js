@@ -28,8 +28,8 @@ const startSendOtpConsumer = async () => {
                         host: "smtp.gmail.com",
                         port: 465,
                         auth: {
-                            user: process.env.User,
-                            pass: process.env.Password,
+                            user: process.env.GMAIL_USER,
+                            pass: process.env.GMAIL_PASSWORD,
                         },
                     });
                     await transporter.sendMail({

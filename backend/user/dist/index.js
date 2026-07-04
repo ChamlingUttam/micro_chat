@@ -11,7 +11,8 @@ const redis_1 = require("redis");
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const rabbitmq_1 = require("./config/rabbitmq");
 const app = (0, express_1.default)();
-app.use("api/v1", user_routes_1.default);
+app.use(express_1.default.json());
+app.use("/api/v1", user_routes_1.default);
 const PORT = process.env.PORT;
 exports.redisCLient = (0, redis_1.createClient)({
     url: process.env.REDIS_URL,

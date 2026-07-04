@@ -1,6 +1,8 @@
 import "dotenv/config"
 import express from "express"
+import { startSendOtpConsumer } from "./consumer"
 
+startSendOtpConsumer()
 const app = express()
 
 const PORT = process.env.PORT

@@ -1,7 +1,7 @@
 import "dotenv/config"
 import amqp from "amqplib"
 import nodemailer from "nodemailer"
-import { duplexPair } from "nodemailer/lib/xoauth2"
+
 
 export const startSendOtpConsumer = async()=>{
     try {
@@ -32,8 +32,8 @@ export const startSendOtpConsumer = async()=>{
                         host:"smtp.gmail.com",
                         port:465,
                         auth:{
-                            user: process.env.User,
-                            pass: process.env.Password,
+                            user: process.env.GMAIL_USER,
+                            pass: process.env.GMAIL_PASSWORD,
                         },
                     })
                         await transporter.sendMail({
@@ -58,4 +58,3 @@ export const startSendOtpConsumer = async()=>{
     }
 }
 
-export const 

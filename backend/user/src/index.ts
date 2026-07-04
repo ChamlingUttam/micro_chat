@@ -8,7 +8,9 @@ import { connectRabbitMQ } from "./config/rabbitmq"
 const app = express()
 
 
-app.use("api/v1",userRoute)
+app.use(express.json())
+app.use("/api/v1",userRoute)
+
 const PORT = process.env.PORT
 
 
