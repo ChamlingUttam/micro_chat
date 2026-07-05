@@ -4,11 +4,12 @@ import connectDb from "./config/db"
 import { createClient } from "redis"
 import userRoute from "./routes/user.routes"
 import { connectRabbitMQ } from "./config/rabbitmq"
-
+import cors from "cors"
 const app = express()
 
 
 app.use(express.json())
+app.use(cors())
 app.use("/api/v1",userRoute)
 
 const PORT = process.env.PORT
