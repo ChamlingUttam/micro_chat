@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.myProfile = exports.verifyUser = exports.loginUser = void 0;
+exports.getAUser = exports.getAllUser = exports.updateName = exports.myProfile = exports.verifyUser = exports.loginUser = void 0;
 const index_1 = require("../index");
 const tryCatch_1 = require("../config/tryCatch");
 const rabbitmq_1 = require("../config/rabbitmq");
@@ -59,6 +59,38 @@ exports.verifyUser = (0, tryCatch_1.TryCatch)(async (req, res) => {
 });
 exports.myProfile = (0, tryCatch_1.TryCatch)(async (req, res) => {
     const user = req.user;
+    res.json(user);
+});
+exports.updateName = (0, tryCatch_1.TryCatch)(async (req, res) => {
+    const user = await User_1.User.findById(req.user?._id);
+    if (!user) {
+        res.status(401).json({
+            message: "please login"
+        });
+        return;
+    }
+    user.name = req.body.name;
+    await user.save();
+    const token = (0, generateToken_1.generateToken)(user);
+    res.json({
+        message: "user name updated",
+        user,
+        token,
+    });
+});
+exports.getAllUser = (0, tryCatch_1.TryCatch)(async (req, res) => {
+    const users = await User_1.User.find();
+    res.json(users);
+});
+exports.getAUser = (0, tryCatch_1.TryCatch)(async (req, res) => {
+    const { id } = req.params;
+    const user = await User_1.User.findById(id);
+    if (!user) {
+        res.status(404).json({
+            message: "User not found"
+        });
+        return;
+    }
     res.json(user);
 });
 //# sourceMappingURL=user.controller.js.map

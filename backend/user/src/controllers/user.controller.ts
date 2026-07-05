@@ -83,3 +83,47 @@ export const myProfile = TryCatch(async(req:AuthenticatedRequest,res)=>{
 
     res.json(user)
 })
+
+export const updateName = TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = await User.findById(req.user?._id)
+
+    if(!user){
+        res.status(401).json({
+            message:"please login"
+        })
+        return 
+    }
+    user.name = req.body.name
+
+    await user.save()
+
+    const token = generateToken(user)
+
+    res.json({
+        message:"user name updated",
+        user,
+        token,
+    })
+})
+
+
+export const getAllUser = TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const users = await User.find()
+
+    res.json(users)
+})
+
+export const getAUser = TryCatch(async (req, res) => {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+        res.status(404).json({
+            message: "User not found"
+        });
+        return;
+    }
+
+    res.json(user);
+});

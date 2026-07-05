@@ -10,5 +10,8 @@ const router = express_1.default.Router();
 router.post('/login', user_controller_1.loginUser);
 router.post('/verify', user_controller_1.verifyUser);
 router.get('/me', isAuth_1.isAuth, user_controller_1.myProfile);
+router.post("/update/user", isAuth_1.isAuth, user_controller_1.updateName);
+router.get("/user/all", isAuth_1.isAuth, user_controller_1.getAllUser);
+router.get("/user/:id", user_controller_1.getAUser);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map
