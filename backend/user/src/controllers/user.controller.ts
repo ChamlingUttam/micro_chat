@@ -4,6 +4,7 @@ import { TryCatch } from "../config/tryCatch";
 import { publishTOQueue } from "../config/rabbitmq";
 import { User } from "../model/User";
 import { generateToken } from "../config/generateToken";
+import { AuthenticatedRequest } from "../middleware/isAuth";
 
 export const loginUser = TryCatch(async(req,res)=>{
     const {email} = req.body
@@ -75,4 +76,10 @@ export const verifyUser = TryCatch(async(req,res)=>{
         message:"user verified",
         user,
         token})
+})
+
+export const myProfile = TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = req.user
+
+    res.json(user)
 })
