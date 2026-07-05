@@ -1,0 +1,63 @@
+
+# ===========================
+# Dependencies
+# ===========================
+backend/node_modules/
+frontend/node_modules/
+
+# If you add more packages later
+**/node_modules/
+
+# ===========================
+# Environment Variables
+# ===========================
+backend/.env
+frontend/.env
+
+# Or ignore every .env file in the repo
+**/.env
+**/.env.local
+
+# ===========================
+# Build Output
+# ===========================
+backend/dist/
+frontend/dist/
+backend/build/
+frontend/build/
+
+# ===========================
+# Logs
+# ===========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ===========================
+# TypeScript
+# ===========================
+*.tsbuildinfo
+
+# ===========================
+# Coverage
+# ===========================
+coverage/
+
+# ===========================
+# IDE
+# ===========================
+.vscode/
+.idea/
+
+# ===========================
+# OS Files
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# Misc
+# ===========================
+*.pid
+*.seed
