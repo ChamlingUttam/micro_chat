@@ -276,3 +276,87 @@ export const sendMessage = TryCatch(async(req:AuthenticatedRequest,res)=>{
         sender:senderId
     })
 })
+
+export const getMessageByChat = TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const {chatId} = req.params
+    const userId = req.user?._id
+
+    if(!userId){
+        res.status(401).json({
+            message:"user unauthorize"
+        })
+        return 
+    }
+
+    if(!chatId){
+        res.status(400).json({
+            message:"chatId is required"
+        })
+        return 
+    }
+
+    const chat = await Chat.findById(chatId)
+
+    if(!chat){
+        res.status(403).json({
+            message:"chat not found"
+        })
+        return 
+    }
+
+    const isUserInChat = chat.users.some(
+        (userId)=>userId.toString() === userId.toString()
+    )
+
+     if(!isUserInChat){
+        res.status(403).json({
+            message:"you are not participate in this chat"
+        })
+        return 
+    }
+
+    const messagesToMarkSeen = await Message.find({
+        chatId:chatId,
+        sender:{$ne:userId},
+        seen:false
+    }) 
+
+    await Message.updateMany({
+         chatId:chatId,
+        sender:{$ne:userId},
+        seen:false
+    },{
+        seen:true,
+        seenAt:new Date()
+    })
+
+    const messages = await Message.find({chatId}).sort({createdAt:1})
+    const otherUserId = chat.users.find((id)=>id!==userId)
+
+    try {
+        const { data } = await axios.get(`${process.env.USER_SERVICE}/api/v1/user/${otherUserId}`)
+
+        if(!otherUserId){
+             res.status(400).json({
+            message:"no other user  found"
+        })
+        return 
+        }
+
+        //socket code
+
+        res.json({
+            messages,
+            user:data
+        })
+
+
+    } catch (error) {
+        console.log(error)
+        res.json({
+            messages,
+            user:{_id:otherUserId,name:"unknown user"}
+        })
+    }
+    
+})
