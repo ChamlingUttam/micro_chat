@@ -1,0 +1,46 @@
+"use state"
+import { ArrowRight, Loader2, Lock } from 'lucide-react'
+import React from 'react'
+
+const VerifyOtp = () => {
+  return (
+   <div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>
+      <div className='max-w-md w-full'>
+        <div className='bg-gray-800 border border-gray-700 rounded-lg p-8'>
+          <div className='text-center mb-8'>
+            <div className='mx-auto w-20 h-20 bg-blue-600 rounded-lg flex items-center justify-center mb-6'>
+              <Lock size={40} className='text-white'/>
+            </div>
+            <h1 className='text-white font-bold text-4xl'>Verify your account</h1>
+            <p className='text-white text-lg'>Enter your email to continue</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className='space-y-6' >
+            <div>
+              <label htmlFor="email" className='text-white block text-sm mb-2'>Email</label>
+              <input type="email" id='email' className='w-full px-4 py-4 bg-gray-700 border-gray-600 rounded-lg placeholder-gray-400' placeholder='enter your email' required value={email} onChange={(e)=> setEmail(e.target.value)} />
+            </div>
+            <button type='submit' className='w-full bg-blue-600 text-white py-4 px-6 rounded-lg
+            font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled={loading}'>
+              {loading  ? (
+                <div className='flex items-center justify-center gap-2'>
+                  <Loader2 className='w-5 h-5'/>
+                  sending otp to your email...
+
+                </div> )
+                :( <div className='flex items-center justify-center gap-2'>
+                <span>Send verification code</span>
+                <ArrowRight className='w-5 h-5' />
+              </div>
+              )}
+             
+
+            </button>
+          </form>
+        </div>
+      </div>
+     </div>
+  )
+}
+
+export default VerifyOtp
