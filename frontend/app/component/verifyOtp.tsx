@@ -3,12 +3,15 @@
 
 import axios from "axios"
 import { ArrowRight, ChevronLeft, Loader2, Lock } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { redirect, useRouter, useSearchParams } from "next/navigation"
 import React, { useEffect, useRef, useState } from "react"
 import Cookies from "js-cookie"
-import { user_service } from "../context/AppContext"
+import { useAppData, user_service } from "../context/AppContext"
+import Loading from "./Loading"
+import toast from "react-hot-toast"
 
 const VerifyOtp = () => {
+  const {isAuth,setIsAuth,setUser,loading:userLoading} = useAppData()
   const [loading, setLoading] = useState(false)
   const searchParams = useSearchParams()
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""])
@@ -93,7 +96,7 @@ const VerifyOtp = () => {
         }
       )
 
-      alert(data.message)
+      toast.success(data.message)
 
       Cookies.set("token", data.token, {
         expires: 15,
@@ -103,6 +106,9 @@ const VerifyOtp = () => {
 
       setOtp(["", "", "", "", "", ""])
       inputRef.current[0]?.focus()
+      setUser(data.user)
+        setIsAuth(true)
+      
     } catch (error: any) {
       setError(error.response?.data?.message || "Something went wrong.")
     } finally {
@@ -122,7 +128,7 @@ const VerifyOtp = () => {
         }
       )
 
-      alert(data.message)
+      toast.success(data.message)
       setTimer(60)
     } catch (error: any) {
       setError(error.response?.data?.message || "Something went wrong.")
@@ -130,6 +136,10 @@ const VerifyOtp = () => {
       setResendLoading(false)
     }
   }
+
+  if(userLoading) return <Loading/>
+
+  if(isAuth) redirect("/chat")
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">

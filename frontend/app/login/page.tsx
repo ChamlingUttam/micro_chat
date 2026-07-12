@@ -1,14 +1,18 @@
 "use client"
 import axios from 'axios'
 import { ArrowRight, Loader2, Mail } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { user_service } from '../context/AppContext'
+import { useAppData, user_service } from '../context/AppContext'
+import Loading from '../component/Loading'
+import toast from 'react-hot-toast'
 
 const Login = () => {
   const [email,setEmail] = useState<string>("")
   const [loading,setLoading]= useState<boolean>(false)
   const router = useRouter()
+
+  const{isAuth,loadind:userLoading} = useAppData()
 
   const handleSubmit = async(e:React.FormEvent<HTMLFormElement>):Promise<void>=>{
 
@@ -19,14 +23,17 @@ const Login = () => {
        const {data} = await axios.post(`${user_service}/api/v1/login`,{
         email
        })  
-       alert(data.message)
+       toast.success(data.message)
        router.push(`/verify?email=${email}`)
     } catch (error:any) {
-      alert(error.response.data.message)
+      toast.success(error.response.data.message)
     }finally{
       setLoading(false)
     }
   }
+
+  if(userLoading) return <Loading/>
+  if(isAuth) redirect("/chat")
   return (
     <div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>
       <div className='max-w-md w-full'>

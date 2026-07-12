@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import VerifyOtp from '../component/verifyOtp'
+import Loading from '../component/Loading'
 
 const VerifyPage = () => {
   return (
-    <div>
+    <Suspense fallback={<Loading/>}>
       <VerifyOtp/>
-    </div>
+    </Suspense>
+    
   )
 }
 
