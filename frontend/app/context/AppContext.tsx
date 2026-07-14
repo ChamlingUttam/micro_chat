@@ -102,7 +102,8 @@ export const AppProvider:React.FC<AppProviderProps> =({ children })=>{
         }
     }
 
-    const [users, setUsers] = useState()
+    // const [users, setUsers] = useState()
+    const [users, setUsers] = useState<User[] | null>(null)
 
     async function fetchUsers(){
         const token = Cookies.get("token")
@@ -114,7 +115,8 @@ export const AppProvider:React.FC<AppProviderProps> =({ children })=>{
                     Authorization:`Bearer ${token}`
                 }
             })
-            setUsers(data.users)
+            console.log("Users:", data.users)
+            setUsers(data)
             
         } catch (error) {
             console.log(error)
