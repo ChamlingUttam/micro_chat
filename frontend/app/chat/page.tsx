@@ -131,7 +131,9 @@ const ChatApp = () => {
     isTyping={isTyping}
 />
 
-<ChatMessages />
+<ChatMessages  selectedUser={selectedUser}
+  messages={messages}
+  loggedInUser={loggedInUser}/>
 </div>
     </div>
     </>
