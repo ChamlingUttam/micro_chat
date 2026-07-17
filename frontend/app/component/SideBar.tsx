@@ -198,6 +198,7 @@ interface ChatSidebarProps {
   selectedUser: string | null;
   setSelectedUser: (userId: string | null) => void;
   handleLogout: () => void;
+  createChat:(user: User)=>void
 }
 
 const SideBar = ({
@@ -211,6 +212,7 @@ const SideBar = ({
   selectedUser,
   setSelectedUser,
   handleLogout,
+  createChat,
 }: ChatSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -291,6 +293,7 @@ const SideBar = ({
                   <button
                     key={u._id}
                     className="w-full text-left p-4 rounded-lg border border-gray-700 hover:border-gray-800 transition-colors"
+                    onClick={()=>createChat(u)}
                   >
                     <div className="relative">
                       <UserCircle className="w-6 h-6 text-gray-300" />

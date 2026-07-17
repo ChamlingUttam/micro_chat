@@ -2,10 +2,16 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { useAppData, User } from '../context/AppContext'
+import { chat_service, useAppData, User } from '../context/AppContext'
 import { useRouter } from 'next/navigation'
 import Loading from '../component/Loading'
 import SideBar from '../component/SideBar'
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import ChatHeader from '../component/ChatHeader'
+import ChatMessages from '../component/ChatMessages'
+
 
 export interface Message{
   _id:string
@@ -47,7 +53,58 @@ const ChatApp = () => {
 
   const handleLogout = ()=>logoutUser()
 
+  async function fetchChat(){
+    const token = Cookies.get("token")
+
+    try {
+      const {data} = await axios.get(`${chat_service}/api/v1/message/${selectedUser}`,{
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setMessages(data.messages)
+      setUser(data.user)
+      await fetchChats()
+    } catch (error) {
+      console.log(error)
+      toast.error("failed to load message")
+      
+    }
+  }
+
+  async function createChat(u:User){
+
+   try {
+     const token = Cookies.get("token")
+    const {data} = await axios.post(`${chat_service}/api/v1/chat/new`,{
+      userId:loggedInUser?._id,
+      otherUserId:u._id
+    },{
+      headers:{
+        Authorization: `Bearer ${token}`
+      }
+    })
+    setSelectedUser(data.chatId)
+    setShowAllUser(false)
+    await fetchChats()
+
+   } catch (error) {
+    toast.error("failed to start chat")
+   }
+
+  }
+
+
+  useEffect(()=>{
+    if(selectedUser){
+      fetchChat()
+    }
+
+  },[selectedUser])
+
   if(loading) return <Loading/>
+
+
   return (
     <>
     <div className='min-h-screen flex bg-gray-900 text-white  relative overflow-hidden'>
@@ -62,7 +119,20 @@ const ChatApp = () => {
     selectedUser={selectedUser}
     setSelectedUser={setSelectedUser}
     handleLogout={handleLogout}
+    createChat={createChat}
 />
+
+{/** chat header */}
+<div className='flex-1 p-4 flex justify-between backdrop-blur-xl  border borer-white/10 flex-col bg-white/5 '>
+
+<ChatHeader
+    user={user}
+    setSidebarOpen={setSidebarOpen}
+    isTyping={isTyping}
+/>
+
+<ChatMessages />
+</div>
     </div>
     </>
   )
