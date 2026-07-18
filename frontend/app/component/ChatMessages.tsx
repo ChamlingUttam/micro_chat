@@ -3,6 +3,7 @@ import { Message } from '../chat/page'
 import { User } from '../context/AppContext'
 import moment from "moment"
 import { Check, CheckCheck } from 'lucide-react'
+import Image from 'next/image'
 // import { Flashlight } from 'lucide-react'
 
 
@@ -56,7 +57,7 @@ const ChatMessages = ({selectedUser,messages,loggedInUser}: chatMessages)  => {
                                         <div className={`rounded-lg p-3 max-w-sm ${isSentByMe ? "bg-blue-600 text-white" : "bg-gray-700 text-white"}`}>
                                             {e.messageType === "image" && e.image &&(
                                                 <div className='relative group'>
-                                                    <img src={e.image.url} alt="shared image" className='max-w-full h-auto rounded-lg' />
+                                                    <img  src={e.image.url}  alt="shared image"className='max-w-full h-auto rounded-lg' />
                                                 </div>
                                             )}
 

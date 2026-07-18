@@ -11,6 +11,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import ChatHeader from '../component/ChatHeader'
 import ChatMessages from '../component/ChatMessages'
+import MessageInput from '../component/MessageInput'
 
 
 export interface Message{
@@ -30,7 +31,7 @@ export interface Message{
 
 
 const ChatApp = () => {
-  const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats,setChatsk} = useAppData()
+  const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats,setChats} = useAppData()
 
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [message, setMessage] = useState("")
@@ -95,6 +96,65 @@ const ChatApp = () => {
   }
 
 
+  const handleMessagesend = async(e:any,imageFile?:File | null)=>{
+    e.preventDefault()
+
+    if(!message.trim() && !imageFile ) return 
+
+    if(!selectedUser) return
+    //socket work
+
+    const token = Cookies.get("token")
+
+    try {
+      const formData = new FormData()
+      formData.append("chatId", selectedUser)
+
+      if(message.trim()){
+        formData.append("text",message)
+      }
+
+      if(imageFile){
+        formData.append("image",imageFile)
+      }
+
+      const {data} = await axios.post(`${chat_service}/api/v1/message`,formData,{
+        headers:{
+          Authorization: `Bearer ${token}`,
+          "Content-Type":"multipart/form-data"
+        }
+      })
+
+      setMessages((prev)=>{
+        const currentMessages = prev || []
+        const messageExists = currentMessages.some(
+          (msg)=>msg._id === data.message._id
+        )
+
+        if(!messageExists){
+          return [...currentMessages,data.message]
+        }
+        return currentMessages
+      })
+
+      setMessage("")
+
+      const displayText = imageFile ? "image" : message
+    } catch (error:any) {
+      toast.error(error.response.data.message)
+      
+    }
+
+  }
+
+  const handleTyping= (value:string)=>{
+    setMessage(value )
+
+    if(!selectedUser) return
+
+    //socket setup
+  }
+
   useEffect(()=>{
     if(selectedUser){
       fetchChat()
@@ -134,6 +194,8 @@ const ChatApp = () => {
 <ChatMessages  selectedUser={selectedUser}
   messages={messages}
   loggedInUser={loggedInUser}/>
+
+  <MessageInput selectedUser={selectedUser} message={message} setMessage={handleTyping} handleMessageSend={handleMessagesend}/>
 </div>
     </div>
     </>
