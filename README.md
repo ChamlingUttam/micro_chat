@@ -54,3 +54,15 @@ docker run -d --hostname rabbit-host --name rabbitmq \
 
 # 4. Confirm both containers exist, and the new one is running
 docker ps -a
+
+
+
+# ABOUT THE MULTER 
+
+multer → Receives uploaded files from the client.
+multer-storage-cloudinary → Sends those uploaded files directly to Cloudinary instead of saving them on your server.
+
+
+| `multer`                    | Parses file uploads (`multipart/form-data`) and makes uploaded files available in Express (`req.file` or `req.files`). |
+
+| `multer-storage-cloudinary` | A storage engine for `multer` that uploads files directly to Cloudinary instead of storing them on your server.        |
