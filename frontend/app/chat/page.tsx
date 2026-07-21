@@ -12,6 +12,7 @@ import toast from 'react-hot-toast'
 import ChatHeader from '../component/ChatHeader'
 import ChatMessages from '../component/ChatMessages'
 import MessageInput from '../component/MessageInput'
+import { SocketData } from '../context/SocketContext'
 
 
 export interface Message{
@@ -33,6 +34,9 @@ export interface Message{
 const ChatApp = () => {
   const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats,setChats} = useAppData()
 
+  const {onlineUsers} = SocketData()
+
+  console.log(onlineUsers)
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [message, setMessage] = useState("")
   const [sidebarOpen, setSidebarOpen] = useState(false)

@@ -3,7 +3,7 @@ import express from "express"
 import connectDb from "./config/db"
 import chatRouter from "./routes/chat.route"
 import cors from "cors"
-import { app } from "./config/socket"
+import { app, server } from "./config/socket"
 
 
 
@@ -13,6 +13,6 @@ app.use("/api/v1",chatRouter)
 const PORT = process.env.PORT
 
 connectDb()
-app.listen(PORT,()=>{
+server.listen(PORT,()=>{
     console.log(`chat service is running at ${PORT}`)
 })

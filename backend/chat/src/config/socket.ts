@@ -1,9 +1,9 @@
-import exrpess from "express"
+import express from "express"
 import { Server,Socket } from "socket.io"
 import http from "http"
 
 
-const app = exrpess()
+const app = express()
 
 const server = http.createServer(app)
 
@@ -20,7 +20,17 @@ const userSocketMap: Record<string,string> = {}
 io.on("connection",(socket:Socket)=>{
     console.log("user connected",socket.id)
 
-    Socket.on("disconnect",()=>{
+    const userId = socket.handshake.query.userId as string | undefined
+
+    if(userId && userId !=="undefined")
+    {
+        userSocketMap[userId] = socket.id
+        console.log(`user ${userId} mapped to socket ${socket.id}`)
+    }
+
+    io.emit("getOnlineUser",Object.keys(userSocketMap))
+
+    socket.on("disconnect",()=>{
         console.log("user disconnected",socket.id)
     })
 
