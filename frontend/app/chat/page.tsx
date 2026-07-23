@@ -40,7 +40,7 @@ const ChatApp = () => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [message, setMessage] = useState("")
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[] |null>(null)
+  const [messages, setMessages] = useState<Message[] >([])
   const [user, setUser] = useState<User | null>(null)
   const [showAllUser, setShowAllUser] = useState(false)
   const [isTyping,setIsTyping] = useState(false)
@@ -75,6 +75,59 @@ const ChatApp = () => {
       toast.error("failed to load message")
       
     }
+  }
+
+  const moveChatToTop = (chatId:string,newMessage:any,updatedUnseenCount=true)=>{
+    setChats((prev)=>{
+      if(!prev) return null
+
+      const updatedChats = [...prev]
+      const chatIndex = updatedChats.findIndex(
+        (chat)=>chat.chat._id === chatId
+      )
+
+      if(chatIndex !== -1 ){
+        const [moveChat] = updatedChats.splice(chatIndex,1)
+
+        const updatedChat = {
+          ...moveChat,
+          chat:{
+            ...moveChat.chat,
+            latestMessage:{
+              text:newMessage.text,
+              sender:newMessage.sender,
+            },
+            updatedAt:new Date().toString(),
+
+            unseenCount:
+            updatedUnseenCount && newMessage.sender !==loggedInUser?._id 
+            ?(moveChat.chat.unseenCount || 0) + 1
+            :moveChat.chat.unseenCount || 0
+          }
+        }
+        updatedChats.unshift(updatedChat)
+      }
+      return updatedChats
+    })
+  }
+
+  const resetUnseenCount = (chatId:string)=>{
+    setChats((prev)=>{
+      if(!prev) return null
+
+      return prev.map((chat)=>{
+        if(chat.chat._id === chatId){
+          return {
+            ...chat,
+            chat:{
+              ...chat.chat,
+              unseenCount : 0
+            }
+          }
+        }
+        return chat
+      })
+    })
   }
 
   async function createChat(u:User){
@@ -197,6 +250,29 @@ const ChatApp = () => {
 
 
   useEffect(()=>{
+
+    socket?.on("newMessage",(message)=>{
+
+      console.log("received new message:",message)
+
+      if(selectedUser ===message.chatId){
+        setMessages((prev)=>{
+          const currentMessages = prev || []
+          const messageExists =currentMessages.some(
+            (msg)=>msg._id ===message._id
+          )
+
+          if(!messageExists){
+            return [...currentMessages,message]
+          }
+          return currentMessages
+        })
+
+        moveChatToTop(message.chatId,message,false)
+      }
+    })
+
+
     socket?.on("userTyping",(data)=>{
       console.log("received user typing",data)
       if(data.chatId === selectedUser && data.userId !==loggedInUser?._id){
@@ -213,11 +289,12 @@ const ChatApp = () => {
     })
 
     return ()=>{
+      socket?.off("newMessage")
       socket?.off("userTyping")
       socket?.off("userStoppedTyping")
 
     }
-  },[socket,selectedUser,loggedInUser?._id])
+  },[socket,setChats,selectedUser,loggedInUser?._id])
     
 
 
@@ -226,6 +303,7 @@ const ChatApp = () => {
     if(selectedUser){
       fetchChat()
       setIsTyping(false)
+      resetUnseenCount(selectedUser)
 
       socket?.emit("joinChat",selectedUser)
 
