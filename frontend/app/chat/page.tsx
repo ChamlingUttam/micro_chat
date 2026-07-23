@@ -184,6 +184,7 @@ const ChatApp = () => {
     setSelectedUser={setSelectedUser}
     handleLogout={handleLogout}
     createChat={createChat}
+    onlineUsers ={onlineUsers} 
 />
 
 {/** chat header */}
@@ -193,6 +194,7 @@ const ChatApp = () => {
     user={user}
     setSidebarOpen={setSidebarOpen}
     isTyping={isTyping}
+    onlineUsers={onlineUsers}
 />
 
 <ChatMessages  selectedUser={selectedUser}

@@ -1,4 +1,4 @@
-import { Menu, UserCircle } from 'lucide-react'
+import { Divide, Menu, UserCircle } from 'lucide-react'
 import React from 'react'
 import { User } from '../context/AppContext'
 
@@ -7,9 +7,11 @@ interface chatHeaderProps{
     user: User |null
     setSidebarOpen :(open:boolean) => void
     isTyping:boolean
+    onlineUsers:string[]
 }
 
-const ChatHeader = ({user,setSidebarOpen,isTyping}:chatHeaderProps) => {
+const ChatHeader = ({user,setSidebarOpen,isTyping,onlineUsers}:chatHeaderProps) => {
+  const isOnlineUser= user && onlineUsers.includes(user._id)
   return (
     <>
       {/** menu toggle */}
@@ -30,6 +32,13 @@ const ChatHeader = ({user,setSidebarOpen,isTyping}:chatHeaderProps) => {
                   <UserCircle className='w-8 h-8 text-gray-300'/>
                 </div>
                 {/** online user setup */}
+                {
+                  isOnlineUser && (
+                    <span className='absolute -bottom-1 -right-1 w-5 h-5  rounded-full bg-green-500 border-2 border-gray-800'>
+                      <span className='absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75'></span>
+                    </span>
+                  )
+                }
               </div>
 
               {/** usr info */}
@@ -39,9 +48,32 @@ const ChatHeader = ({user,setSidebarOpen,isTyping}:chatHeaderProps) => {
                   <h2 className='text-2xl font-bold text-white truncate'></h2>
                   {user.name}
                 </div>
+              {/** to show typing status */}
+              <div className='flex items-center gap-2 '>
+
+
+                {
+                  isTyping ? (
+                  <div className='flex items-center gap-2 text-sm'>
+                    <div className='flex gap-1'>
+                        <div className='w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce'></div>
+                        <div className='w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce ' style={{animationDelay:"0.1s"}}></div>
+                        <div className='w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce' style={{animationDelay:"0.2s"}}></div>
+                    </div>
+                    <span className='text-blue-500 font-medium'>typing...</span>
+                  </div>
+                  ) : (
+                    <div className='flex items-center gap-2 '>
+                      <div className={`bg-green-500 rounded-full ${isOnlineUser ? "bg-green-500" : "bg-gray-500"}`}></div>
+                      <span className={`text-sm font-medium ${isOnlineUser ? "text-green-500" : "text-gray-500"}` }>{
+                        isOnlineUser ? "Online" : "Offline"
+                        } </span>
+                    </div>
+                  )}
               </div>
 
-              {/** to show typing status */}
+              </div>
+
             </>
           ) : ( 
             <div className='flex items-center gap-4'>
@@ -52,7 +84,7 @@ const ChatHeader = ({user,setSidebarOpen,isTyping}:chatHeaderProps) => {
                   <h2 className='text-2xl font-bold text-gray-400'>
                     select a conversation
                   </h2>
-                  <p className='text-sm text-gray-500 mt-1'>choose a chat to start chating</p>
+                  <p className='text-sm text-gray-500 mt-1'>choose a chat to start chatting</p>
 
                  </div>
             </div>
