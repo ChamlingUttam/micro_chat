@@ -30,6 +30,37 @@ io.on("connection",(socket:Socket)=>{
 
     io.emit("getOnlineUser",Object.keys(userSocketMap))
 
+    if(userId){
+        socket.join(userId)
+    }
+
+    socket.on("typing",(data)=>{
+        console.log(`user ${data.userId} is typing in chat ${data.chatId} `)
+        socket.to(data.chatId).emit("userTyping",{
+            chatId:data.chatId,
+            userId:data.userId
+        })
+    })
+
+    socket.on("stopTyping",(data)=>{
+        console.log(`user ${data.user} stopped typing in chat ${data.chatId}` )
+        socket.to(data.chatId).emit("userStoppedTyping",{
+             chatId:data.chatId,
+            userId:data.userId
+        })
+    })
+
+    socket.on("joinChat",(chatId)=>{
+        socket.join(chatId)
+        console.log(`user ${userId} joined chat room ${chatId}`)
+    })
+
+    socket.on("leaveChat",(chatId)=>{
+        socket.leave("user Disconnect",socket.id)
+    })
+
+
+
     socket.on("disconnect",()=>{
         console.log("user disconnected",socket.id)
 

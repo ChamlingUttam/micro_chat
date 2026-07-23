@@ -34,7 +34,7 @@ export interface Message{
 const ChatApp = () => {
   const {loading,isAuth,logoutUser,chats,user:loggedInUser,users,fetchChats,setChats} = useAppData()
 
-  const {onlineUsers} = SocketData()
+  const {onlineUsers,socket} = SocketData()
 
   console.log(onlineUsers)
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
@@ -106,7 +106,19 @@ const ChatApp = () => {
     if(!message.trim() && !imageFile ) return 
 
     if(!selectedUser) return
-    //socket work
+
+
+    //socket setup
+
+    if(typingTimeout){
+      clearTimeout(typingTimeout)
+      setTypingTimeOut(null)
+    }
+
+    socket?.emit("stopTyping",{
+      chatId:selectedUser,
+      userId:loggedInUser?._id
+    })
 
     const token = Cookies.get("token")
 
@@ -154,17 +166,84 @@ const ChatApp = () => {
   const handleTyping= (value:string)=>{
     setMessage(value )
 
-    if(!selectedUser) return
+    if(!selectedUser || !socket) return
 
-    //socket setup
+    //socket work
+
+    if(value.trim()){
+      socket.emit("typing",{
+        chatId:selectedUser,
+        userId: loggedInUser?._id
+      })
+    }
+
+    if(typingTimeout){
+      clearTimeout(typingTimeout)
+    }
+
+    const timeout = setTimeout(()=>{
+      socket.emit("stopTyping",{
+          chatId:selectedUser,
+        userId: loggedInUser?._id
+
+      })
+    },2000)
+
+    setTypingTimeOut(timeout)
+
+
+
   }
+
+
+  useEffect(()=>{
+    socket?.on("userTyping",(data)=>{
+      console.log("received user typing",data)
+      if(data.chatId === selectedUser && data.userId !==loggedInUser?._id){
+        setIsTyping(true)
+      }
+    })
+
+
+     socket?.on("userStoppedTyping",(data)=>{
+      console.log("received user stopped typing",data)
+      if(data.chatId === selectedUser && data.userId !==loggedInUser?._id){
+        setIsTyping(false)
+      }
+    })
+
+    return ()=>{
+      socket?.off("userTyping")
+      socket?.off("userStoppedTyping")
+
+    }
+  },[socket,selectedUser,loggedInUser?._id])
+    
+
+
 
   useEffect(()=>{
     if(selectedUser){
       fetchChat()
+      setIsTyping(false)
+
+      socket?.emit("joinChat",selectedUser)
+
+      return ()=>{
+        socket?.emit("leaveChat",selectedUser)
+        setMessages(null)
+      }
     }
 
-  },[selectedUser])
+  },[selectedUser,socket])
+
+  useEffect(()=>{
+    return ()=>{
+      if(typingTimeout){
+        clearTimeout(typingTimeout)
+      }
+    }
+  },[typingTimeout])
 
   if(loading) return <Loading/>
 
